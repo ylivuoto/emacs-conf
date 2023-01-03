@@ -12,3 +12,84 @@ making changes. Sometimes, when making changes to settings
 graphically, emacs will create some new lines to .emacs file and there
 will be duplicates with the .org config file - watch out those!
 
+
+==================== CONFIGURATION FILE STARTS =======================
+
+Structured configuration file for Emacs with org mode.
+
+* Appearance
+** Window
+
+#+BEGIN_SRC emacs-lisp
+  (custom-set-variables
+   '(current-language-environment "UTF-8")
+   '(custom-enabled-themes '(misterioso))
+   '(menu-bar-mode nil)
+   '(tool-bar-mode nil)
+   '(window-divider-default-right-width 1)
+   '(global-display-line-numbers-mode t)
+   '(window-divider-mode t))
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook (lambda ()
+			       (drag-stuff-global-mode 1)
+			       (toggle-scroll-bar 0)))
+#+END_SRC
+
+** Mode line
+
+#+BEGIN_SRC emacs-lisp
+(custom-set-variables
+  '(column-number-mode t)
+  '(mode-line-compact t))
+
+  (set-face-attribute 'mode-line nil
+		      :background "dark slate grey"
+		      :foreground "white"
+		      :box '(:line-width 8 :color "dark slate grey")
+		      :overline nil
+		      :underline nil)
+
+  (set-face-attribute 'mode-line-inactive nil
+		      :background "#182b2b"
+		      :foreground "white"
+		      :box '(:line-width 8 :color "#182b2b")
+		      :overline nil
+		      :underline nil)
+#+END_SRC
+
+* Org bulleting
+#+BEGIN_SRC emacs-lisp
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda ()(org-bullets-mode 1)))
+#+END_SRC
+
+* Usability packages
+** Neotree
+#+BEGIN_SRC emacs-lisp
+  (require 'neotree)
+  (global-set-key [f8] 'neotree-toggle)
+#+END_SRC
+
+** Drag-stuff
+#+BEGIN_SRC emacs-lisp
+    (require 'drag-stuff)
+    (add-hook 'after-init-hook (lambda () (drag-stuff-global-mode 1)))
+    ;;(add-hook 'org-mode-hook (lambda () (drag-stuff-global-mode 1)))
+
+  (with-eval-after-load 'org
+    (define-key org-mode-map [(control shift up)]  'drag-stuff-up)
+    (define-key org-mode-map [(control shift down)]  'drag-stuff-down))
+
+#+END_SRC
+
+* Mail settings
+Send mail using SMTP via Google. 
+Send mail using SMTP on the mail submission port 587.
+#+BEGIN_SRC emacs-lisp
+  (setq smtpmail-smtp-server "imap.gmail.com")
+  (setq smtpmail-smtp-service 587)
+#+END_SRC
