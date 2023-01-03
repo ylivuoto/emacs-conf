@@ -1,0 +1,14 @@
+* Emacs configuration
+All the sections below will contain declarations for my emacs
+setup. When using .org configuration file, please include a short line
+in your .emacs or init.el file
+
+#+BEGIN_SRC emacs-lisp
+  (org-babel-load-file (expand-file-name "~/.emacs.d/my-conf.org"))
+#+END_SRC
+
+or similar to include your fresh config file! Also, be careful when
+making changes. Sometimes, when making changes to settings
+graphically, emacs will create some new lines to .emacs file and there
+will be duplicates with the .org config file - watch out those!
+
