@@ -40,6 +40,7 @@ Well, your *.emacs* file might look something like this:
 Structured configuration file for Emacs with org mode. Since you
 already have something in your *.emacs* file, these will take effect
 when emacs starts.
+
 ** Appearance
 Here are collection of delcarations and packages that mainly affects
 to appearance of emacs.
@@ -113,12 +114,24 @@ These helps you to use emacs without breaking your nerves!
 #+END_SRC
 
 *** Helm
-Autocompletes and suggests stuff, when giving commands etc.
+Suggests and organizes stuff, when giving commands etc.
 #+BEGIN_SRC emacs-lisp
   (use-package helm
     :ensure t
     :bind ("M-x" . helm-M-x)
     :init (helm-mode 1))
+#+END_SRC
+
+*** Yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t)
+#+END_SRC
+
+Let's also define paths for snippets, they will be organized all into
+their own folders and files.
+#+BEGIN_SRC emacs-lisp
+  (setq yas-snippet-dirs '("~/emacs.d/snippets/org-mode"))
 #+END_SRC
 
 ** Misc
