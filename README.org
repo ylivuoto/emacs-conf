@@ -3,7 +3,9 @@ All the sections below will contain declarations for my emacs
 setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
 
-#+BEGIN_SRC emacs-lisp
+#+HEADER: :eval no :exports code
+#+BEGIN_SRC
+  ;; Include something like this your .emacs file:
   (org-babel-load-file (expand-file-name "~/.emacs.d/my-conf.org"))
 #+END_SRC
 
@@ -13,9 +15,30 @@ graphically, emacs will create some new lines to .emacs file and there
 will be duplicates with the .org config file - watch out those!
 
 
-==================== CONFIGURATION FILE STARTS =======================
+* Configuration file starts from here
 
-Structured configuration file for Emacs with org mode.
+Structured configuration file for Emacs with org mode. Please include
+at least these below your *.emacs* file also, to get the custom file
+working properly.
+
+#+HEADER: :eval no :exports code
+#+BEGIN_SRC
+  ;; Let's set up essential package archives
+  (require 'package)
+  (add-to-list 'package-archives
+ 	       '("melpa" . "http://melpa.org/packages/") t)
+  (unless package--initialized (package-initialize))
+  
+  ;; For ease of use, highly recommended to use this package
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+  
+  ;; The rest of the configuration is taken care in a separate file, at
+  ;; the moment called README.org but may be named whatever sensible.
+  (add-to-list 'load-path "~/.emacs.d/extra-config-files/")
+  (org-babel-load-file (expand-file-name "~/.emacs.d/extra-config-files/my-conf.org"))
+#+END_SRC
 
 * Appearance
 ** Window
@@ -28,10 +51,10 @@ Structured configuration file for Emacs with org mode.
    '(tool-bar-mode nil)
    '(window-divider-default-right-width 1)
    '(global-display-line-numbers-mode t)
+   '(fringe-mode '(16 . 0))
+   '(neo-smart-open t)
    '(window-divider-mode t))
 #+END_SRC
-
-#+RESULTS:
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook (lambda ()
@@ -84,6 +107,15 @@ Structured configuration file for Emacs with org mode.
     (define-key org-mode-map [(control shift up)]  'drag-stuff-up)
     (define-key org-mode-map [(control shift down)]  'drag-stuff-down))
 
+#+END_SRC
+
+** Helm
+Autocompletes and suggests stuff, when giving commands etc.
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t
+    :bind ("M-x" . helm-M-x)
+    :init (helm-mode 1))
 #+END_SRC
 
 * Mail settings
