@@ -14,12 +14,7 @@ making changes. Sometimes, when making changes to settings
 graphically, emacs will create some new lines to .emacs file and there
 will be duplicates with the .org config file - watch out those!
 
-
-* Configuration file starts from here
-
-Structured configuration file for Emacs with org mode. Please include
-at least these below your *.emacs* file also, to get the custom file
-working properly.
+Well, your *.emacs* file might look something like this:
 
 #+HEADER: :eval no :exports code
 #+BEGIN_SRC
@@ -40,8 +35,15 @@ working properly.
   (org-babel-load-file (expand-file-name "~/.emacs.d/extra-config-files/my-conf.org"))
 #+END_SRC
 
-* Appearance
-** Window
+* Configuration file starts from here
+
+Structured configuration file for Emacs with org mode. Since you
+already have something in your *.emacs* file, these will take effect
+when emacs starts.
+** Appearance
+Here are collection of delcarations and packages that mainly affects
+to appearance of emacs.
+*** Window
 
 #+BEGIN_SRC emacs-lisp
   (custom-set-variables
@@ -62,7 +64,7 @@ working properly.
 			       (toggle-scroll-bar 0)))
 #+END_SRC
 
-** Mode line
+*** Mode line
 
 #+BEGIN_SRC emacs-lisp
 (custom-set-variables
@@ -84,20 +86,21 @@ working properly.
 		      :underline nil)
 #+END_SRC
 
-* Org bulleting
+*** Org bulleting
 #+BEGIN_SRC emacs-lisp
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda ()(org-bullets-mode 1)))
 #+END_SRC
 
-* Usability packages
-** Neotree
+** Usability packages
+These helps you to use emacs without breaking your nerves!
+*** Neotree
 #+BEGIN_SRC emacs-lisp
   (require 'neotree)
   (global-set-key [f8] 'neotree-toggle)
 #+END_SRC
 
-** Drag-stuff
+*** Drag-stuff
 #+BEGIN_SRC emacs-lisp
     (require 'drag-stuff)
     (add-hook 'after-init-hook (lambda () (drag-stuff-global-mode 1)))
@@ -109,7 +112,7 @@ working properly.
 
 #+END_SRC
 
-** Helm
+*** Helm
 Autocompletes and suggests stuff, when giving commands etc.
 #+BEGIN_SRC emacs-lisp
   (use-package helm
@@ -118,7 +121,9 @@ Autocompletes and suggests stuff, when giving commands etc.
     :init (helm-mode 1))
 #+END_SRC
 
-* Mail settings
+** Misc
+Some variable declarations and/or packages which might be useful too.
+*** Mail settings
 Send mail using SMTP via Google. 
 Send mail using SMTP on the mail submission port 587.
 #+BEGIN_SRC emacs-lisp
