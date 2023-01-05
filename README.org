@@ -2,7 +2,7 @@
 All the sections below will contain declarations for my emacs
 setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
-
+n
 #+HEADER: :eval no :exports code
 #+BEGIN_SRC
   ;; Include something like this your .emacs file:
@@ -52,12 +52,15 @@ to appearance of emacs.
    '(custom-enabled-themes '(misterioso))
    '(menu-bar-mode nil)
    '(tool-bar-mode nil)
-   '(window-divider-default-right-width 1)
    '(global-display-line-numbers-mode t)
    '(fringe-mode '(16 . 0))
    '(neo-smart-open t)
-   '(window-divider-mode t))
+   '(window-divider-mode t)
+   '(window-divider-default-places 'right-only)
+   '(window-divider-default-right-width 1))
 #+END_SRC
+
+#+RESULTS:
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook (lambda ()
@@ -71,7 +74,10 @@ to appearance of emacs.
 (custom-set-variables
   '(column-number-mode t)
   '(mode-line-compact t))
+#+END_SRC
 
+**** Appearance declarations
+#+BEGIN_SRC emacs-lisp
   (set-face-attribute 'mode-line nil
 		      :background "dark slate grey"
 		      :foreground "white"
@@ -85,6 +91,7 @@ to appearance of emacs.
 		      :box '(:line-width 8 :color "#182b2b")
 		      :overline nil
 		      :underline nil)
+
 #+END_SRC
 
 *** Org bulleting
@@ -122,7 +129,30 @@ Suggests and organizes stuff, when giving commands etc.
     :init (helm-mode 1))
 #+END_SRC
 
+**** Appearance tweak
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'helm-header nil
+		      :background "dark slate grey"
+		      :foreground "white"
+		      :box '(:line-width 8 :color "dark slate gray"))
+
+  (set-face-attribute 'helm-source-header nil
+		      :background "dark slate grey"
+		      :foreground "white"
+		      :box '(:line-width 2 :color "dark slate grey"))
+
+  (set-face-attribute 'helm-selection nil
+		      :foreground "orange"
+		      :weight 'bold)
+
+  (set-face-attribute 'helm-candidate-number nil
+		      :background "DarkSlateGray3"
+		      :box '(:line-width 8 :color "DarkSlateGray3")
+		      :extend nil)
+
+#+END_SRC
 *** Yasnippet
+
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure t)
@@ -134,6 +164,7 @@ their own folders and files.
   (setq yas-snippet-dirs '("~/emacs.d/snippets/org-mode"))
 #+END_SRC
 
+*** Company-mode
 ** Misc
 Some variable declarations and/or packages which might be useful too.
 *** Mail settings
