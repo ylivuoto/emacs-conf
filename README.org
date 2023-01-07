@@ -45,16 +45,18 @@ when emacs starts.
 #+BEGIN_SRC emacs-lisp
 ;;  describe-coding-system 'unix
 #+END_SRC
-** Appearanxce
+** Appearance
 Here are collection of delcarations and packages that mainly affects
 to appearance of emacs.
 *** Window
 
 #+BEGIN_SRC emacs-lisp
-  current-language-environment "UTF-8"
-  custom-enabled-themes '(misterioso)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
   menu-bar-mode nil
   tool-bar-mode nil
+
+  current-language-environment "UTF-8"
+  custom-enabled-themes '(misterioso)
   global-display-line-numbers-mode t
   fringe-mode '(16 . 0)
   window-divider-mode t
@@ -73,6 +75,7 @@ to appearance of emacs.
 
 *** Mode line
 **** Powerline
+
 #+BEGIN_SRC emacs-lisp
   (use-package powerline
     :ensure t
@@ -82,6 +85,7 @@ to appearance of emacs.
 #+END_SRC
 
 **** Appearance declarations
+
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'mode-line nil
 		      :background "dark slate grey"
@@ -123,11 +127,25 @@ to appearance of emacs.
   powerline-height 32
 #+END_SRC
 
-*** Org bulleting
+*** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :ensure t
-    :init (add-hook 'org-mode-hook (lambda ()(org-bullets-mode 1))))
+    :init (add-hook 'org-mode-hook (lambda ()(org-bullets-mode 1)
+				     (org-indent-mode))))
+#+END_SRC
+
+**** Appearance of bullets
+#+BEGIN_SRC emacs-lisp
+  (setq org-bullets-bullet-list '("●"
+                                  "○"
+                                  "•"
+                                  "◆"))
+
+  ;;'("α"
+  ;;  "β"
+  ;;  "λ"
+  ;;  "ω")
 #+END_SRC
 
 ** Usability packages
@@ -165,24 +183,25 @@ Suggests and organizes stuff, when giving commands etc.
 **** Appearance tweak
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'helm-header nil
-		      :background "dark slate grey"
-		      :foreground "white"
-		      :box '(:line-width 8 :color "dark slate gray"))
+                      :background "dark slate grey"
+                      :foreground "white"
+                      :box '(:line-width 8 :color "dark slate gray"))
 
   (set-face-attribute 'helm-source-header nil
-		      :background "dark slate grey"
-		      :foreground "white"
-		      :box '(:line-width 2 :color "dark slate grey"))
+                      :background "dark slate grey"
+                      :foreground "white"
+                      :box '(:line-width 2 :color "dark slate grey"))
 
   (set-face-attribute 'helm-selection nil
-		      :background nil
-		      :foreground "orange"
-		      :weight 'bold)
+                      :background nil
+                      :foreground "orange"
+                      :weight 'bold)
 
   (set-face-attribute 'helm-candidate-number nil
-		      :background "DarkSlateGray3"
-		      :box '(:line-width 8 :color "DarkSlateGray3")
-		      :extend nil)
+                      :background "DarkSlateGray3"
+                      :box '(:line-width 8 :color "DarkSlateGray3")
+                      :extend nil)
+
 
 #+END_SRC
 
@@ -201,6 +220,11 @@ their own folders and files.
 #+END_SRC
 
 *** Company-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :init (global-company-mode t))
+#+END_SRC
 ** Misc
 Some variable declarations and/or packages which might be useful too.
 *** Mail settings
