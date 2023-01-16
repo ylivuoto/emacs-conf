@@ -54,7 +54,6 @@ to appearance of emacs.
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
   menu-bar-mode nil
   tool-bar-mode nil
-
   current-language-environment "UTF-8"
   custom-enabled-themes '(misterioso)
   global-display-line-numbers-mode t
@@ -69,8 +68,23 @@ to appearance of emacs.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook (lambda ()
-			       (drag-stuff-global-mode 1)
-			       (toggle-scroll-bar 0)))
+                               (drag-stuff-global-mode 1)
+                               (toggle-scroll-bar 0)
+                               (my-startup-func)))
+
+  (defun my-startup-func ()
+    (require 'widget)
+      "Startup buffer"
+      (let ((start-buffer (get-buffer-create "STARTUP")))
+        (with-current-buffer start-buffer
+          ;; this is what you customize
+          (setq img (create-image "d:/youtubevideot/logo/logo_solid_white.png" 'png nil :heuristic-mask t))
+          (insert-image img)
+          (insert-button "\nHome\n" 'action (lambda (x) (find-file "~/")))
+          (insert-button "Main Configurations\n" 'action (lambda (x) (find-file "~/.emacs")))
+          (insert-button "Custom Configurations\n\n" 'action (lambda (x) (find-file "~/.emacs.d/emacs-conf/README.org")))
+          (insert-button "Notes\n" 'action (lambda (x) (find-file "d:/notes/"))))
+        (switch-to-buffer start-buffer)))
 #+END_SRC
 
 *** Mode line
@@ -124,7 +138,7 @@ to appearance of emacs.
   column-number-mode t
   mode-line-compact nil
   powerline-default-separator 'wave
-  powerline-height 32
+  powerline-height 38
 #+END_SRC
 
 *** Org bullets
