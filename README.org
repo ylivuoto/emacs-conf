@@ -2,7 +2,7 @@
 All the sections below will contain declarations for my emacs
 setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
-n
+
 #+HEADER: :eval no :exports code
 #+BEGIN_SRC
   ;; Include something like this your .emacs file:
@@ -43,7 +43,12 @@ when emacs starts.
 
 ** General
 #+BEGIN_SRC emacs-lisp
-;;  describe-coding-system 'unix
+  ;;  describe-coding-system 'unix
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (when (or (daemonp) (memq window-system '(ns x)))
+      (exec-path-from-shell-initialize)))
 #+END_SRC
 ** Appearance
 Here are collection of delcarations and packages that mainly affects
@@ -137,7 +142,7 @@ to appearance of emacs.
 #+BEGIN_SRC emacs-lisp
   column-number-mode t
   mode-line-compact nil
-  powerline-default-separator 'wave
+  powerline-default-separator 'arrow
   powerline-height 38
 #+END_SRC
 
@@ -245,9 +250,15 @@ their own folders and files.
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
     :ensure t
-    :init (lambda() (smartparens-global-mode 1)
-            (show-smartparens-global-mode t)))
+    :init (add-hook 'org-mode-hook (lambda () '(require smartparens-org))))
 #+END_SRC
+*** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :config (global-flycheck-mode))
+#+END_SRC
+** Coding and versioning
 *** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -255,6 +266,28 @@ their own folders and files.
     :bind (("C-x g" . magit-status)))
 #+END_SRC
 
+*** Web dev
+**** JS
+**** TS
+#+BEGIN_SRC emacs-lisp
+  (defun setup-tide-mode ()
+    "Set up tide mode and turn on related modes with tide specific configurations."
+    (tide-setup)
+    (tide-hl-identifier-mode 1)
+    (flycheck-mode 1)
+    (setq flycheck-check-syntax-automatically
+          '(save mode-enabled idle-change)
+          (company-mode 1)
+          (eldoc-mode 1)
+
+          (use-package tide
+            :ensure t
+            :after (typescript-mode flycheck company)
+            :hook ((typescript-mode . setup-tide-mode)
+                   (before-save . tide-format-before-save)))
+#+END_SRC
+**** HTML
+**** CSS
 ** Misc
 Some variable declarations and/or packages which might be useful too.
 *** Mail settings
@@ -264,3 +297,5 @@ Send mail using SMTP on the mail submission port 587.
   (setq smtpmail-smtp-server "imap.gmail.com")
   (setq smtpmail-smtp-service 587)
 #+END_SRC
+
+
