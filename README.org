@@ -57,8 +57,9 @@ to appearance of emacs.
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  menu-bar-mode nil
-  tool-bar-mode nil
+  menu-bar-mode -1
+  tool-bar-mode -1
+  scroll-bar-mode -1
   current-language-environment "UTF-8"
   custom-enabled-themes '(misterioso)
   global-display-line-numbers-mode t
@@ -69,8 +70,11 @@ to appearance of emacs.
   font-lock-maximum-decoration t
 #+END_SRC
 
-#+RESULTS:
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'server-after-make-frame-hook (lambda() (scroll-bar-mode -1)))
+#+END_SRC
 
+*** Startup screen
 #+BEGIN_SRC emacs-lisp
   (add-hook 'after-init-hook (lambda ()
                                (drag-stuff-global-mode 1)
@@ -86,8 +90,9 @@ to appearance of emacs.
           (setq img (create-image "d:/youtubevideot/logo/logo_solid_white.png" 'png nil :heuristic-mask t))
           (insert-image img)
           (insert-button "\nHome\n" 'action (lambda (x) (find-file "~/")))
+          (insert-button "WSL\n" 'action (lambda (x) (find-file "//wsl.localhost/Ubuntu-20.04")))
           (insert-button "Main Configurations\n" 'action (lambda (x) (find-file "~/.emacs")))
-          (insert-button "Custom Configurations\n\n" 'action (lambda (x) (find-file "~/.emacs.d/emacs-conf/README.org")))
+          (insert-button "Custom Configurations\n" 'action (lambda (x) (find-file "~/.emacs.d/emacs-conf/README.org")))
           (insert-button "Notes\n" 'action (lambda (x) (find-file "d:/notes/"))))
         (switch-to-buffer start-buffer)))
 #+END_SRC
@@ -107,43 +112,43 @@ to appearance of emacs.
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'mode-line nil
-		      :background "dark slate grey"
-		      :foreground "white"
-		      :box '(:line-width 1 :color "dark slate grey")
-		      :overline nil
-		      :underline nil)
+                      :background "dark slate grey"
+                      :foreground "white"
+                      :box '(:line-width 1 :color "dark slate grey")
+                      :overline nil
+                      :underline nil)
 
   (set-face-attribute 'mode-line-inactive nil
-		      :background "#182b2b"
-		      :foreground "white"
-		      :box '(:line-width 1 :color "#182b2b")
-		      :overline nil
-		      :underline nil)
+                      :background "#182b2b"
+                      :foreground "white"
+                      :box '(:line-width 1 :color "#182b2b")
+                      :overline nil
+                      :underline nil)
 
   (set-face-attribute 'powerline-active1 nil
-		      :background "DarkSlateGray4"
-		      :foreground "black"
-		      :overline nil
-		      :underline nil)
+                      :background "DarkSlateGray4"
+                      :foreground "black"
+                      :overline nil
+                      :underline nil)
 
   (set-face-attribute 'powerline-active2 nil
-		      :background "DarkSlateGray3"
-		      :foreground "black"
-		      :overline nil
-		      :underline nil)
+                      :background "DarkSlateGray3"
+                      :foreground "black"
+                      :overline nil
+                      :underline nil)
 
   (set-face-attribute 'powerline-inactive2 nil
-		      :background "#182b2b"
-		      :foreground "white"
-		      :overline nil
-		      :underline nil)
+                      :background "#182b2b"
+                      :foreground "white"
+                      :overline nil
+                      :underline nil)
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
   column-number-mode t
   mode-line-compact nil
-  powerline-default-separator 'arrow
-  powerline-height 38
+  (setq powerline-default-separator 'slant)
+  (setq powerline-height 38)
 #+END_SRC
 
 *** Org bullets
@@ -151,15 +156,16 @@ to appearance of emacs.
   (use-package org-bullets
     :ensure t
     :init (add-hook 'org-mode-hook (lambda ()(org-bullets-mode 1)
-				     (org-indent-mode))))
+                                     (org-indent-mode))))
 #+END_SRC
 
 **** Appearance of bullets
 #+BEGIN_SRC emacs-lisp
   (setq org-bullets-bullet-list '("●"
+                                  "◉"
                                   "○"
                                   "•"
-                                  "◆"))
+                                  "·"))
 
   ;;'("α"
   ;;  "β"
@@ -179,10 +185,9 @@ These helps you to use directories without breaking your nerves!
 
 *** Drag-stuff
 #+BEGIN_SRC emacs-lisp
-    (use-package drag-stuff
-      :ensure t
-      :init (add-hook 'after-init-hook (lambda () (drag-stuff-global-mode 1))))
-    ;;(add-hook 'org-mode-hook (lambda () (drag-stuff-global-mode 1)))
+  (use-package drag-stuff
+    :ensure t
+    :init (add-hook 'after-init-hook (lambda () (drag-stuff-global-mode 1))))
 
   (with-eval-after-load 'org
     (define-key org-mode-map [(control shift up)]  'drag-stuff-up)
@@ -238,19 +243,27 @@ their own folders and files.
   (setq yas-snippet-dirs '("~/emacs.d/snippets/org-mode"))
 #+END_SRC
 
+
 *** Company-mode
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
-    :config (setq company-backends '((company-clang)
-                                     (company-yasnippet)))
+                                          ; :config (setq company-backends '((company-clang)
+                                          ;                                 (company-yasnippet)))
     :init (global-company-mode t))
+#+END_SRC
+
+Different compnay backends below:
+#+BEGIN_SRC emacs-lisp
+  (use-package company-auctex
+    :ensure t)
 #+END_SRC
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
     :ensure t
-    :init (add-hook 'org-mode-hook (lambda () '(require smartparens-org))))
+    :init (require 'smartparens-config)
+    :config (smartparens-global-mode t))
 #+END_SRC
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -278,13 +291,26 @@ their own folders and files.
     (setq flycheck-check-syntax-automatically
           '(save mode-enabled idle-change)
           (company-mode 1)
-          (eldoc-mode 1)
+          (eldoc-mode 1)))
 
-          (use-package tide
-            :ensure t
-            :after (typescript-mode flycheck company)
-            :hook ((typescript-mode . setup-tide-mode)
-                   (before-save . tide-format-before-save)))
+  (use-package typescript-mode
+    :ensure t)
+
+  (use-package tide
+    :ensure t
+    ;:after  (typescript-mode flycheck company)
+    :hook ((typescript-mode . setup-tide-mode)
+           (before-save . tide-format-before-save)))
+
+  (use-package web-mode
+    :ensure t)
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-hook 'web-mode-hook
+            (lambda ()
+              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+                (setup-tide-mode))))
+  ;; enable typescript-tslint checker
+  (flycheck-add-mode 'typescript-tslint 'web-mode)
 #+END_SRC
 **** HTML
 **** CSS
@@ -297,5 +323,4 @@ Send mail using SMTP on the mail submission port 587.
   (setq smtpmail-smtp-server "imap.gmail.com")
   (setq smtpmail-smtp-service 587)
 #+END_SRC
-
 
