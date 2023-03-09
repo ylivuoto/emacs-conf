@@ -50,56 +50,48 @@ when emacs starts.
     (when (or (daemonp) (memq window-system '(ns x)))
       (exec-path-from-shell-initialize)))
 #+END_SRC
+
+#+RESULTS:
+: t
+
 ** Appearance
+
 Here are collection of delcarations and packages that mainly affects
 to appearance of emacs.
 *** Window
 
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  menu-bar-mode -1
-  tool-bar-mode -1
-  scroll-bar-mode -1
-  current-language-environment "UTF-8"
-  custom-enabled-themes '(misterioso)
-  global-display-line-numbers-mode t
-  fringe-mode '(16 . 0)
-  window-divider-mode t
-  window-divider-default-places 'right-only
-  window-divider-default-right-width 1
-  font-lock-maximum-decoration t
+    (add-to-list 'default-frame-alist '(fullscreen . maximized))
+    menu-bar-mode -1
+    tool-bar-mode -1
+    scroll-bar-mode -1
+    current-language-environment "UTF-8"
+    custom-enabled-themes '(misterioso)
+    global-display-line-numbers-mode t
+    fringe-mode '(16 . 0)
+    window-divider-mode t
+    window-divider-default-places 'right-only
+    window-divider-default-right-width 1
+    font-lock-maximum-decoration t
+
+    (set-face-attribute 'header-line nil
+                        :background "#2e3748"
+                        :foreground "gray"
+                        :height 96)
+  
+    (setq header-line-height 32)
+
+
 #+END_SRC
+
+#+RESULTS:
+: 32
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'server-after-make-frame-hook (lambda() (scroll-bar-mode -1)))
 #+END_SRC
 
-*** Startup screen
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook (lambda ()
-                               (drag-stuff-global-mode 1)
-                               (toggle-scroll-bar 0)
-                               (my-startup-func)))
-
-  (defun my-startup-func ()
-    (require 'widget)
-      "Startup buffer"
-      (let ((start-buffer (get-buffer-create "STARTUP")))
-        (with-current-buffer start-buffer
-          ;; this is what you customize
-          (setq img (create-image "d:/youtubevideot/logo/logo_solid_white.png" 'png nil :heuristic-mask t))
-          (insert-image img)
-          (insert-button "\nHome\n" 'action (lambda (x) (find-file "~/")))
-          (insert-button "WSL\n" 'action (lambda (x) (find-file "//wsl.localhost/Ubuntu-20.04")))
-          (insert-button "Main Configurations\n" 'action (lambda (x) (find-file "~/.emacs")))
-          (insert-button "Custom Configurations\n" 'action (lambda (x) (find-file "~/.emacs.d/emacs-conf/README.org")))
-          (insert-button "Notes\n" 'action (lambda (x) (find-file "d:/notes/"))))
-        (switch-to-buffer start-buffer)))
-#+END_SRC
-
-*** Mode line
-**** Powerline
-
+*** Powerline
 #+BEGIN_SRC emacs-lisp
   (use-package powerline
     :ensure t
@@ -108,31 +100,32 @@ to appearance of emacs.
 
 #+END_SRC
 
-**** Appearance declarations
+Also some appearance declaraitions for modeline
 
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'mode-line nil
-                      :background "dark slate grey"
+                      :background "#e67128"
                       :foreground "white"
-                      :box '(:line-width 1 :color "dark slate grey")
+                      :box '(:line-width 2 :color "#233B3B")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'mode-line-inactive nil
                       :background "#182b2b"
-                      :foreground "white"
+                      :foreground "DarkGrey"
                       :box '(:line-width 1 :color "#182b2b")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'powerline-active1 nil
-                      :background "DarkSlateGray4"
+                      :background "#23d7d7"
                       :foreground "black"
                       :overline nil
                       :underline nil)
 
+
   (set-face-attribute 'powerline-active2 nil
-                      :background "DarkSlateGray3"
+                      :background "#008b8b"
                       :foreground "black"
                       :overline nil
                       :underline nil)
@@ -151,6 +144,9 @@ to appearance of emacs.
   (setq powerline-height 38)
 #+END_SRC
 
+#+RESULTS:
+: 38
+
 *** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -159,7 +155,9 @@ to appearance of emacs.
                                      (org-indent-mode))))
 #+END_SRC
 
-**** Appearance of bullets
+#+RESULTS:
+
+Let's just set some cool bullets for orgbullets
 #+BEGIN_SRC emacs-lisp
   (setq org-bullets-bullet-list '("●"
                                   "◉"
@@ -173,6 +171,140 @@ to appearance of emacs.
   ;;  "ω")
 #+END_SRC
 
+*** Colors
+Some colors here, defined to help to use same colors as in the theme
+#+BEGIN_SRC css
+  #2e3748
+  #23d7d7
+  #00ede1
+  #dbdb95
+  #e67128
+  #ffad29
+  #008b8b
+  #74af68
+#+END_SRC
+
+*** All the Icons
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :if (display-graphic-p))
+#+end_src
+
+*** Startup screen
+#+begin_src emacs-lisp
+  (add-hook 'after-init-hook (lambda ()
+                               (drag-stuff-global-mode 1)
+                               (toggle-scroll-bar 0)))
+
+  (use-package dashboard
+    :ensure t
+    :config
+    (dashboard-setup-startup-hook))
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+
+  ;; Set the title
+  (setq dashboard-banner-logo-title "Happy hacking!")
+  (set-face-attribute 'dashboard-banner-logo-title nil
+                      :family "Silkscreen"
+                      :foreground "#e67128"
+                      :height 196)
+
+  ;; (defvar my-face '(:family "Silkscreen"
+  ;;                          :height 144))
+
+  ;; This function is used to insert a clock to separate line
+  ;;    (defun dashboard-insert-custom (list-size)
+  ;;         (defvar timestmp)
+  ;;         (setq timestmp  (current-time-string))
+  ;;         (put-text-property 0 (length timestmp) 'face my-face
+  ;;                            timestmp)
+  ;;         (put-text-property 11 19 'face '(:foreground "#e67128" :family "Silkscreen" :height 164)
+  ;;                            timestmp)
+  ;;
+  ;;         (insert timestmp)
+  ;;         (center-line)
+  ;;
+  ;;         (run-with-timer 1 t (lambda()
+  ;;                               (defvar temp)
+  ;;                               (defvar p)
+  ;;                               (setq temp (current-time-string))
+  ;;                               (setq p (point))
+  ;;                               (while (re-search-forward timestmp nil t)
+  ;;                                 (replace-match temp))
+  ;;                               (setq timestmp temp)
+  ;;                               (when (string= (buffer-name) "*dashboard*")
+  ;;                                 (revert-buffer)
+  ;;                                 (goto-char p)))))
+  ;;
+  ;;
+  ;;        (add-to-list 'dashboard-item-generators  '(custom . dashboard-insert-custom))
+  ;;        (add-to-list 'dashboard-items '(custom) t)
+
+  ;; Running the timestring with a timer, and
+  ;; then calling the func with the help of custom and
+  ;; finally altering an appearance a bit
+
+  ;; NOTE: MODIFICATIONS TO DASHBOARD-WIDGETS.EL ALSO NECESSARY! (2023-03-09)
+  ;; A new face needs to be defined there and assigned for dashboard-init-info
+  (defun run-clock (list-size)
+    "Running a clock with timer"
+    (setq time (current-time-string))
+    ;; (put-text-property 11 19 'face '(:foreground "#e67128" :family "Silkscreen" :height 178)
+    ;;                                                                time)
+    (setq dashboard-init-info time)
+    (run-with-timer 1 t (lambda()
+                          (setq time (current-time-string))
+                          (defvar p)
+                          (setq p (point))
+                          (when (string= (buffer-name) "*dashboard*")
+                            (revert-buffer)
+                            (goto-char p)))))
+
+  (add-to-list 'dashboard-item-generators  '(custom . run-clock))
+  (add-to-list 'dashboard-items '(custom) t)
+
+  ;; Tweaking the clock's look, this face has to
+  ;; be created separately to dashboard-widgets.el
+  (set-face-attribute 'dashboard-init-info-face nil
+                      :family "Silkscreen"
+                      :height 178
+                      :foreground "#74af68")
+
+  (setq dashboard-startup-banner "d:/youtubevideot/logo/logo_pixelated_small.png")
+  ;; Value can be
+  ;; - nil to display no banner
+  ;; - 'official which displays the official emacs logo
+  ;; - 'logo which displays an alternative emacs logo
+  ;; - 1, 2 or 3 which displays one of the text banners
+  ;; - "path/to/your/image.gif", "path/to/your/image.png" or "path/to/your/text.txt" which displays whatever gif/image/text you would prefer
+  ;; - a cons of '("path/to/your/image.png" . "path/to/your/text.txt")
+
+  ;; Content is not centered by default. To center, set
+  (setq dashboard-center-content t)
+
+  ;; Icons to places
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+
+  ;; Footer
+  (setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
+  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                     :height 1.1
+                                                     :v-adjust -0.05
+                                                     :face 'font-lock-keyword-face))
+  ;; Change the font for footer
+  (set-face-attribute 'dashboard-footer nil
+                      :family "Silkscreen")
+
+  ;; Items displayed
+  ;; TODO: Proper trigger needed for clock.
+  ;; Using custom here to trigger the clock. A bit
+  ;; messy solution but works.
+  (setq dashboard-items '((custom . 1)
+                          (recents  . 7)
+                          (bookmarks . 7)))
+#+end_src
 ** Usability packages
 These helps you to use directories without breaking your nerves!
 *** Neotree
@@ -187,11 +319,12 @@ These helps you to use directories without breaking your nerves!
 #+BEGIN_SRC emacs-lisp
   (use-package drag-stuff
     :ensure t
+    :bind (("C-S-<up>" . drag-stuff-up) ("C-S-<down>" . drag-stuff-down))
     :init (add-hook 'after-init-hook (lambda () (drag-stuff-global-mode 1))))
 
-  (with-eval-after-load 'org
-    (define-key org-mode-map [(control shift up)]  'drag-stuff-up)
-    (define-key org-mode-map [(control shift down)]  'drag-stuff-down))
+;  (with-eval-after-load 'org
+ ;   (define-key org-mode-map [(control shift up)]  'drag-stuff-up)
+  ;  (define-key org-mode-map [(control shift down)]  'drag-stuff-down))
 
 #+END_SRC
 
@@ -204,7 +337,7 @@ Suggests and organizes stuff, when giving commands etc.
     :init (helm-mode 1))
 #+END_SRC
 
-**** Appearance tweak
+Appearance tweak
 #+BEGIN_SRC emacs-lisp
   (set-face-attribute 'helm-header nil
                       :background "dark slate grey"
@@ -217,7 +350,7 @@ Suggests and organizes stuff, when giving commands etc.
                       :box '(:line-width 2 :color "dark slate grey"))
 
   (set-face-attribute 'helm-selection nil
-                      :background nil
+                      :background 'unspecified
                       :foreground "orange"
                       :weight 'bold)
 
@@ -232,32 +365,37 @@ Suggests and organizes stuff, when giving commands etc.
 *** Yasnippet
 
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :init (yas-global-mode t))
+    (use-package yasnippet
+      :ensure t
+      :init (yas-global-mode t))
+
+    (use-package yasnippet-snippets
+      :ensure t)
 #+END_SRC
 
 Let's also define paths for snippets, they will be organized all into
 their own folders and files.
 #+BEGIN_SRC emacs-lisp
-  (setq yas-snippet-dirs '("~/emacs.d/snippets/org-mode"))
-#+END_SRC
+  (setq yas-snippet-dirs
+        '("~/.emacs.d/snippets"                 ;; personal snippets
+          "~/.emacs.d/elpa/yasnippet-snippets-20230220.1659/snippets")) ;; installed snippets
 
+  (yas-global-mode 1) ;; or M-x yas-reload-all if you've started YASnippet already.
+#+END_SRC
 
 *** Company-mode
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure t
-                                          ; :config (setq company-backends '((company-clang)
-                                          ;                                 (company-yasnippet)))
     :init (global-company-mode t))
 #+END_SRC
 
-Different compnay backends below:
+Different compaay backends below:
 #+BEGIN_SRC emacs-lisp
   (use-package company-auctex
     :ensure t)
 #+END_SRC
+
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
   (use-package smartparens
@@ -272,6 +410,16 @@ Different compnay backends below:
     :config (global-flycheck-mode))
 #+END_SRC
 ** Coding and versioning
+*** Language server
+
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :init (setq lsp-keymap-prefix "C-c l" lsp-typescript-npm "c:/Program Files/nodejs/npm"))
+
+#+END_SRC
+
 *** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -279,41 +427,51 @@ Different compnay backends below:
     :bind (("C-x g" . magit-status)))
 #+END_SRC
 
-*** Web dev
-**** JS
-**** TS
+*** TS
 #+BEGIN_SRC emacs-lisp
-  (defun setup-tide-mode ()
-    "Set up tide mode and turn on related modes with tide specific configurations."
-    (tide-setup)
-    (tide-hl-identifier-mode 1)
-    (flycheck-mode 1)
-    (setq flycheck-check-syntax-automatically
-          '(save mode-enabled idle-change)
-          (company-mode 1)
-          (eldoc-mode 1)))
+  ;;  (defun setup-tide-mode ()
+  ;;    "Set up tide mode and turn on related modes with tide specific configurations."
+  ;;    (tide-setup)
+  ;;    (tide-hl-identifier-mode 1)
+  ;;    (flycheck-mode 1)
+  ;;    (setq flycheck-check-syntax-automatically
+  ;;          '(save mode-enabled idle-change)
+  ;;          (company-mode 1)
+  ;;          (eldoc-mode 1)))
 
-  (use-package typescript-mode
-    :ensure t)
+   (use-package typescript-mode
+     :ensure t)
 
-  (use-package tide
-    :ensure t
-    ;:after  (typescript-mode flycheck company)
-    :hook ((typescript-mode . setup-tide-mode)
-           (before-save . tide-format-before-save)))
+  
+  ;;  (use-package tide
+  ;;    :ensure t
+  ;;    :after  (typescript-mode flycheck company)
+  ;;    :hook ((typescript-mode . setup-tide-mode)
+  ;;           (before-save . tide-format-before-save)))
 
-  (use-package web-mode
-    :ensure t)
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (when (string-equal "tsx" (file-name-extension buffer-file-name))
-                (setup-tide-mode))))
-  ;; enable typescript-tslint checker
-  (flycheck-add-mode 'typescript-tslint 'web-mode)
+  ;;  (use-package web-mode
+  ;;    :ensure t)
+  ;;  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  ;;  (add-hook 'web-mode-hook
+  ;;            (lambda ()
+  ;;              (when (string-equal "tsx" (file-name-extension buffer-file-name))
+  ;;                (setup-tide-mode))))
+  ;;  ;enable typescript-tslint checker
+  ;;  (flycheck-add-mode 'typescript-tslint 'web-mode)
 #+END_SRC
-**** HTML
-**** CSS
+
+*** JS
+#+begin_src emacs-lisp 
+(use-package js2-mode
+    :ensure t )
+  (add-to-list 'auto-mode-alist '("\\.*js\\'" . js2-mode))
+#+end_src
+
+*** Yaml
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml
+    :ensure t)
+#+END_SRC
 ** Misc
 Some variable declarations and/or packages which might be useful too.
 *** Mail settings
@@ -322,5 +480,5 @@ Send mail using SMTP on the mail submission port 587.
 #+BEGIN_SRC emacs-lisp
   (setq smtpmail-smtp-server "imap.gmail.com")
   (setq smtpmail-smtp-service 587)
-#+END_SRC
+  #+END_SRCv
 
