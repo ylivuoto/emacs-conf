@@ -202,6 +202,7 @@ Some colors here, defined to help to use same colors as in the theme
     :config
     (dashboard-setup-startup-hook))
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  (global-set-key (kbd "<pause>") 'dashboard-open)
 
   ;; Set the title
   (setq dashboard-banner-logo-title "Happy hacking!")
@@ -250,8 +251,6 @@ Some colors here, defined to help to use same colors as in the theme
   (defun run-clock (list-size)
     "Running a clock with timer"
     (setq time (current-time-string))
-    ;; (put-text-property 11 19 'face '(:foreground "#e67128" :family "Silkscreen" :height 178)
-    ;;                                                                time)
     (setq dashboard-init-info time)
     (run-with-timer 1 t (lambda()
                           (setq time (current-time-string))
@@ -261,6 +260,8 @@ Some colors here, defined to help to use same colors as in the theme
                             (revert-buffer)
                             (goto-char p)))))
 
+  ;; currently the custom function is not inserting lines, other than
+  ;; it is basically changing the original init-info line
   (add-to-list 'dashboard-item-generators  '(custom . run-clock))
   (add-to-list 'dashboard-items '(custom) t)
 
@@ -293,6 +294,7 @@ Some colors here, defined to help to use same colors as in the theme
                                                      :height 1.1
                                                      :v-adjust -0.05
                                                      :face 'font-lock-keyword-face))
+
   ;; Change the font for footer
   (set-face-attribute 'dashboard-footer nil
                       :family "Silkscreen")
@@ -385,15 +387,23 @@ their own folders and files.
 
 *** Company-mode
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-    :ensure t
-    :init (global-company-mode t))
-#+END_SRC
+    (use-package company
+      :ensure t
+      :init (global-company-mode t))
 
-Different compaay backends below:
-#+BEGIN_SRC emacs-lisp
-  (use-package company-auctex
-    :ensure t)
+    ;;Different compaay backends below:
+    (use-package company-auctex
+      :ensure t)
+
+    (defun my-org-hook ()
+      (set (make-local-variable 'company-backends) '((:separate company-yasnippet company-capf) company-keywords)))
+;      (setq-local company-backends '((:separate company-capf company-yasnippet company-keywords)))
+
+    (add-hook 'org-mode-hook #'my-org-hook)
+
+    (setq company-minimum-prefix-length 2)
+    (setq company-idle-delay
+        (lambda () (if (company-in-string-or-comment) nil 0.2)))
 #+END_SRC
 
 *** Smartparens
@@ -480,5 +490,9 @@ Send mail using SMTP on the mail submission port 587.
 #+BEGIN_SRC emacs-lisp
   (setq smtpmail-smtp-server "imap.gmail.com")
   (setq smtpmail-smtp-service 587)
-  #+END_SRCv
+  #+END_SRC
 
+  
+
+  
+  
