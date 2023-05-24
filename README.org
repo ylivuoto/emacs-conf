@@ -42,12 +42,14 @@ already have something in your *.emacs* file, these will take effect
 when emacs starts.
 
 ** General
+*** Exec-path
+Shell path for linux or osx systems
 #+BEGIN_SRC emacs-lisp
   ;;  describe-coding-system 'unix
   (use-package exec-path-from-shell
     :ensure t
     :config
-    (when (or (daemonp) (memq window-system '(ns x)))
+    (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
 #+END_SRC
 
@@ -187,8 +189,11 @@ Some colors here, defined to help to use same colors as in the theme
 *** All the Icons
 
 #+begin_src emacs-lisp
-  (use-package all-the-icons
-    :if (display-graphic-p))
+    (require 'font-lock)
+  ;  (require 'font-lock+)
+    (use-package all-the-icons
+      :ensure t
+      :if (or (daemonp) (display-graphic-p)))
 #+end_src
 
 *** Startup screen
@@ -290,10 +295,10 @@ Some colors here, defined to help to use same colors as in the theme
 
   ;; Footer
   (setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
-  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-                                                     :height 1.1
-                                                     :v-adjust -0.05
-                                                     :face 'font-lock-keyword-face))
+  ;(setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+   ;                                                  :height 1.1
+    ;                                                 :v-adjust -0.05
+     ;                                                :face 'font-lock-keyword-face))
 
   ;; Change the font for footer
   (set-face-attribute 'dashboard-footer nil
@@ -303,8 +308,8 @@ Some colors here, defined to help to use same colors as in the theme
   ;; TODO: Proper trigger needed for clock.
   ;; Using custom here to trigger the clock. A bit
   ;; messy solution but works.
-  (setq dashboard-items '((custom . 1)
-                          (recents  . 7)
+  (setq dashboard-items '((custom . 0)
+                          (recents  . 5)
                           (bookmarks . 7)))
 #+end_src
 ** Usability packages
@@ -315,6 +320,9 @@ These helps you to use directories without breaking your nerves!
     :ensure t
     :init (global-set-key [f8] 'neotree-toggle))
   neo-smart-open t
+
+  (add-hook 'neo-after-create-hook (lambda (_x) (display-line-numbers-mode -1)))
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 #+END_SRC
 
 *** Drag-stuff
@@ -412,6 +420,7 @@ their own folders and files.
     :ensure t
     :init (require 'smartparens-config)
     :config (smartparens-global-mode t))
+  (sp-pair "{" nil :actions :rem)
 #+END_SRC
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -419,7 +428,45 @@ their own folders and files.
     :ensure t
     :config (global-flycheck-mode))
 #+END_SRC
+*** Org-pomodoro
+
+#+BEGIN_SRC emacs-lisp
+    (use-package org-pomodoro
+      :ensure t)
+
+    (setq org-pomodoro-format "%s")
+    (setq org-pomodoro-length 45)
+    (setq org-pomodoro-short-break-length 5)
+    (setq org-pomodoro-long-break-length 15)
+    (set-face-attribute 'org-pomodoro-mode-line nil
+                        :foreground "black")
+    (set-face-attribute 'org-pomodoro-mode-line-break nil
+                        :foreground "#23d7d7")
+
+    (setq org-pomodoro-audio-player (or (executable-find "aplay")
+                                           (executable-find "afplay")
+                                           (executable-find "play-sound-file")))
+#+END_SRC
+*** Sound-wav
+#+begin_src emacs-lisp
+    (use-package sound-wav
+      :ensure t)
+#+end_src
+*** Powershell
+#+begin_src emacs-lisp
+  (use-package powershell
+    :ensure t)
+#+end_src
 ** Coding and versioning
+*** Hugo
+#+begin_src emacs-lisp
+  ;; Update files with last modifed date, when #+lastmod: is available
+  (setq time-stamp-active t
+        time-stamp-start "#\\+lastmod:[ \t]*"
+        time-stamp-end "$"
+        time-stamp-format "%04Y-%02m-%02d")
+  (add-hook 'before-save-hook 'time-stamp nil)1
+#+end_src
 *** Language server
 
 #+BEGIN_SRC emacs-lisp
@@ -437,7 +484,7 @@ their own folders and files.
     :bind (("C-x g" . magit-status)))
 #+END_SRC
 
-*** TS
+*** Web mode, TS and JS2 mode
 #+BEGIN_SRC emacs-lisp
   ;;  (defun setup-tide-mode ()
   ;;    "Set up tide mode and turn on related modes with tide specific configurations."
@@ -449,30 +496,28 @@ their own folders and files.
   ;;          (company-mode 1)
   ;;          (eldoc-mode 1)))
 
-   (use-package typescript-mode
-     :ensure t)
+  (use-package typescript-mode
+    :ensure t)
 
-  
+
   ;;  (use-package tide
   ;;    :ensure t
   ;;    :after  (typescript-mode flycheck company)
   ;;    :hook ((typescript-mode . setup-tide-mode)
-  ;;           (before-save . tide-format-before-save)))
+  ;;           (before-save . tide-format-before-save)))<
 
-  ;;  (use-package web-mode
-  ;;    :ensure t)
-  ;;  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-  ;;  (add-hook 'web-mode-hook
+  (use-package web-mode
+    :ensure t)
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  ;;    (add-hook 'web-mode-hook
   ;;            (lambda ()
   ;;              (when (string-equal "tsx" (file-name-extension buffer-file-name))
   ;;                (setup-tide-mode))))
-  ;;  ;enable typescript-tslint checker
-  ;;  (flycheck-add-mode 'typescript-tslint 'web-mode)
-#+END_SRC
+                                          ;enable typescript-tslint checker
+  ;;    (flycheck-add-mode 'typescript-tslint 'web-mode)
 
-*** JS
-#+begin_src emacs-lisp 
-(use-package js2-mode
+  (use-package js2-mode
     :ensure t )
   (add-to-list 'auto-mode-alist '("\\.*js\\'" . js2-mode))
 #+end_src
@@ -484,15 +529,3 @@ their own folders and files.
 #+END_SRC
 ** Misc
 Some variable declarations and/or packages which might be useful too.
-*** Mail settings
-Send mail using SMTP via Google. 
-Send mail using SMTP on the mail submission port 587.
-#+BEGIN_SRC emacs-lisp
-  (setq smtpmail-smtp-server "imap.gmail.com")
-  (setq smtpmail-smtp-service 587)
-  #+END_SRC
-
-  
-
-  
-  
