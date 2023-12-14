@@ -51,6 +51,13 @@ Shell path for linux or osx systems
     :config
     (when (memq window-system '(mac ns x))
       (exec-path-from-shell-initialize)))
+
+  ;; Backup files to another location
+  (setq backup-directory-alist `(("." . "~/.emacs-saves")))
+
+  ;; Org agenda files in this dir
+  (setq org-agenda-files nil)
+  (setq org-agenda-files '("~/notes"))
 #+END_SRC
 
 #+RESULTS:
@@ -61,35 +68,8 @@ Shell path for linux or osx systems
 Here are collection of delcarations and packages that mainly affects
 to appearance of emacs.
 *** Window
-
 #+BEGIN_SRC emacs-lisp
-    (add-to-list 'default-frame-alist '(fullscreen . maximized))
-    menu-bar-mode -1
-    tool-bar-mode -1
-    scroll-bar-mode -1
-    current-language-environment "UTF-8"
-    custom-enabled-themes '(misterioso)
-    global-display-line-numbers-mode t
-    fringe-mode '(16 . 0)
-    window-divider-mode t
-    window-divider-default-places 'right-only
-    window-divider-default-right-width 1
-    font-lock-maximum-decoration t
-
-    (set-face-attribute 'header-line nil
-                        :background "#2e3748"
-                        :foreground "gray"
-                        :height 96)
-  
-    (setq header-line-height 32)
-
-
-#+END_SRC
-
-#+RESULTS:
-: 32
-
-#+BEGIN_SRC emacs-lisp
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (add-hook 'server-after-make-frame-hook (lambda() (scroll-bar-mode -1)))
 #+END_SRC
 
@@ -139,16 +119,6 @@ Also some appearance declaraitions for modeline
                       :underline nil)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  column-number-mode t
-  mode-line-compact nil
-  (setq powerline-default-separator 'slant)
-  (setq powerline-height 38)
-#+END_SRC
-
-#+RESULTS:
-: 38
-
 *** Org bullets
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
@@ -187,13 +157,20 @@ Some colors here, defined to help to use same colors as in the theme
 #+END_SRC
 
 *** All the Icons
+NOTE: Be sure to use also 'M-x all-the-icons-install-fonts' and at the
+end just manually install them (Windows 11)
 
 #+begin_src emacs-lisp
-    (require 'font-lock)
-  ;  (require 'font-lock+)
-    (use-package all-the-icons
-      :ensure t
-      :if (or (daemonp) (display-graphic-p)))
+  (require 'font-lock)
+
+  ;; If you need icons and other fancy stuff, uncomment below
+  ;; Additionally, download emacswiki.org/emacs/font-lock+.el and add it
+  ;; to the load path
+
+  (require 'font-lock+)
+
+  (use-package all-the-icons :ensure t :if (or (daemonp)
+    (display-graphic-p)))
 #+end_src
 
 *** Startup screen
@@ -207,12 +184,12 @@ Some colors here, defined to help to use same colors as in the theme
     :config
     (dashboard-setup-startup-hook))
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (global-set-key (kbd "<pause>") 'dashboard-open)
+  (global-set-key (kbd "<f12>") 'dashboard-open)
 
   ;; Set the title
   (setq dashboard-banner-logo-title "Happy hacking!")
   (set-face-attribute 'dashboard-banner-logo-title nil
-                      :family "Silkscreen"
+                      :family "Consolas"
                       :foreground "#e67128"
                       :height 196)
 
@@ -253,6 +230,7 @@ Some colors here, defined to help to use same colors as in the theme
 
   ;; NOTE: MODIFICATIONS TO DASHBOARD-WIDGETS.EL ALSO NECESSARY! (2023-03-09)
   ;; A new face needs to be defined there and assigned for dashboard-init-info
+  ;; Look, below there is used 'dashboard-init-info-face'
   (defun run-clock (list-size)
     "Running a clock with timer"
     (setq time (current-time-string))
@@ -272,12 +250,14 @@ Some colors here, defined to help to use same colors as in the theme
 
   ;; Tweaking the clock's look, this face has to
   ;; be created separately to dashboard-widgets.el
-  (set-face-attribute 'dashboard-init-info-face nil
-                      :family "Silkscreen"
-                      :height 178
-                      :foreground "#74af68")
 
-  (setq dashboard-startup-banner "d:/youtubevideot/logo/logo_pixelated_small.png")
+  ;;Uncomment these few rows, when you have created a new face
+  ;;(set-face-attribute 'dashboard-init-info-face nil
+  ;;		      :family "Consolas"
+  ;;		      :height 178
+  ;;		      :foreground "#74af68")
+
+  ;;(setq dashboard-startup-banner "d:/youtubevideot/logo/logo_pixelated_small.png")
   ;; Value can be
   ;; - nil to display no banner
   ;; - 'official which displays the official emacs logo
@@ -289,20 +269,20 @@ Some colors here, defined to help to use same colors as in the theme
   ;; Content is not centered by default. To center, set
   (setq dashboard-center-content t)
 
-  ;; Icons to places
+  ;; Icons to places  
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
 
   ;; Footer
   (setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
-  ;(setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-   ;                                                  :height 1.1
-    ;                                                 :v-adjust -0.05
-     ;                                                :face 'font-lock-keyword-face))
+  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                     :height 1.1
+                                                     :v-adjust -0.05
+                                                     :face 'font-lock-keyword-face))
 
   ;; Change the font for footer
   (set-face-attribute 'dashboard-footer nil
-                      :family "Silkscreen")
+                      :family "Consolas")
 
   ;; Items displayed
   ;; TODO: Proper trigger needed for clock.
@@ -313,7 +293,7 @@ Some colors here, defined to help to use same colors as in the theme
                           (bookmarks . 7)))
 #+end_src
 ** Usability packages
-These helps you to use directories without breaking your nerves!
+These packages helps you to use directories and files without breaking your nerves!
 *** Neotree
 #+BEGIN_SRC emacs-lisp
   (use-package neotree
@@ -420,7 +400,7 @@ their own folders and files.
     :ensure t
     :init (require 'smartparens-config)
     :config (smartparens-global-mode t))
-  (sp-pair "{" nil :actions :rem)
+  ;(sp-pair "{" nil :actions :rem)
 #+END_SRC
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -429,6 +409,7 @@ their own folders and files.
     :config (global-flycheck-mode))
 #+END_SRC
 *** Org-pomodoro
+
 
 #+BEGIN_SRC emacs-lisp
     (use-package org-pomodoro
@@ -447,6 +428,13 @@ their own folders and files.
                                            (executable-find "afplay")
                                            (executable-find "play-sound-file")))
 #+END_SRC
+*** Beamer
+#+begin_src emacs-lisp
+  (setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction=nonstopmode -output-directory=%o %f"))
+#+end_src
 *** Sound-wav
 #+begin_src emacs-lisp
     (use-package sound-wav
