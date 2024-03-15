@@ -1,10 +1,11 @@
+
 * Emacs configuration
 All the sections below will contain declarations for my emacs
 setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
 
 #+HEADER: :eval no :exports code
-#+BEGIN_SRC
+#+BEGIN_SRC emacs-lisp
   ;; Include something like this your .emacs file:
   (org-babel-load-file (expand-file-name "~/.emacs.d/my-conf.org"))
 #+END_SRC
@@ -17,22 +18,25 @@ will be duplicates with the .org config file - watch out those!
 Well, your *.emacs* file might look something like this:
 
 #+HEADER: :eval no :exports code
-#+BEGIN_SRC
+#+BEGIN_SRC emacs-lisp
   ;; Let's set up essential package archives
-  (require 'package)
+  (require '(point)ackage)
   (add-to-list 'package-archives
- 	       '("melpa" . "http://melpa.org/packages/") t)
+                 '("melpa" . "http://melpa.org/packages/") t)
   (unless package--initialized (package-initialize))
-  
+
   ;; For ease of use, highly recommended to use this package
   (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-  
+      (package-refresh-contents)
+      (package-install 'use-package))
+
   ;; The rest of the configuration is taken care in a separate file, at
   ;; the moment called README.org but may be named whatever sensible.
   (add-to-list 'load-path "~/.emacs.d/extra-config-files/")
   (org-babel-load-file (expand-file-name "~/.emacs.d/extra-config-files/my-conf.org"))
+
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file)
 #+END_SRC
 
 * Configuration file starts from here
@@ -58,6 +62,15 @@ Shell path for linux or osx systems
   ;; Org agenda files in this dir
   (setq org-agenda-files nil)
   (setq org-agenda-files '("~/notes"))
+
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (set-file-name-coding-system 'utf-8)
+  (set-clipboard-coding-system 'utf-8)
+  (set-buffer-file-coding-system 'utf-8)
 #+END_SRC
 
 #+RESULTS:
@@ -75,49 +88,62 @@ to appearance of emacs.
 
 *** Powerline
 #+BEGIN_SRC emacs-lisp
-  (use-package powerline
-    :ensure t
-    :config
-    (powerline-default-theme))
+  ;(use-package powerline
+  ;  :ensure t
+  ;  :config
+  ;  (powerline-default-theme))
 
 #+END_SRC
 
 Also some appearance declaraitions for modeline
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'mode-line nil
-                      :background "#e67128"
-                      :foreground "white"
-                      :box '(:line-width 2 :color "#233B3B")
-                      :overline nil
-                      :underline nil)
+;  (set-face-attribute 'mode-line nil
+;                      :background "#e67128"
+;                      :foreground "white"
+;                      :box '(:line-width 2 :color "#233B3B")
+;                      :overline nil
+;                      :underline nil)
+;
+;  (set-face-attribute 'mode-line-inactive nil
+;                      :background "#182b2b"
+;                      :foreground "DarkGrey"
+;                      :box '(:line-width 1 :color "#182b2b")
+;                      :overline nil
+;                      :underline nil)
+;
+;  (set-face-attribute 'powerline-active1 nil
+;                      :background "#23d7d7"
+;                      :foreground "black"
+;                      :overline nil
+;                      :underline nil)
+;
+;
+;  (set-face-attribute 'powerline-active2 nil
+;                      :background "#008b8b"
+;                      :foreground "black"
+;                      :overline nil
+;                      :underline nil)
+;
+;  (set-face-attribute 'powerline-inactive2 nil
+;                      :background "#182b2b"
+;                      :foreground "white"
+;                      :overline nil
+;                      :underline nil)
+                      #+END_SRC
+		      
+*** Doom-modeline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1))
 
-  (set-face-attribute 'mode-line-inactive nil
-                      :background "#182b2b"
-                      :foreground "DarkGrey"
-                      :box '(:line-width 1 :color "#182b2b")
-                      :overline nil
-                      :underline nil)
+  ;; Whether display the battery status. It respects `display-battery-mode'.
+  (setq doom-modeline-battery t)
 
-  (set-face-attribute 'powerline-active1 nil
-                      :background "#23d7d7"
-                      :foreground "black"
-                      :overline nil
-                      :underline nil)
-
-
-  (set-face-attribute 'powerline-active2 nil
-                      :background "#008b8b"
-                      :foreground "black"
-                      :overline nil
-                      :underline nil)
-
-  (set-face-attribute 'powerline-inactive2 nil
-                      :background "#182b2b"
-                      :foreground "white"
-                      :overline nil
-                      :underline nil)
-#+END_SRC
+  ;; Whether display the time. It respects `display-time-mode'.
+  (setq doom-modeline-time t)
+#+end_src
 
 *** Org bullets
 #+BEGIN_SRC emacs-lisp
@@ -154,23 +180,31 @@ Some colors here, defined to help to use same colors as in the theme
   #ffad29
   #008b8b
   #74af68
+  #2b303b
 #+END_SRC
 
 *** All the Icons
 NOTE: Be sure to use also 'M-x all-the-icons-install-fonts' and at the
 end just manually install them (Windows 11)
 
-#+begin_src emacs-lisp
-  (require 'font-lock)
 
+#+begin_src emacs-lisp
   ;; If you need icons and other fancy stuff, uncomment below
   ;; Additionally, download emacswiki.org/emacs/font-lock+.el and add it
   ;; to the load path
 
-  (require 'font-lock+)
+  ;;        (use-package font-lock+
+  ;;:ensure t)
 
-  (use-package all-the-icons :ensure t :if (or (daemonp)
-    (display-graphic-p)))
+  (use-package all-the-icons
+    :ensure t )
+  ;; Use 'prepend for the NS and Mac ports or Emacs will crash.
+  (set-fontset-font t 'unicode (font-spec :family "all-the-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "file-icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Material Icons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "github-octicons") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "FontAwesome") nil 'append)
+  (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)
 #+end_src
 
 *** Startup screen
@@ -182,14 +216,28 @@ end just manually install them (Windows 11)
   (use-package dashboard
     :ensure t
     :config
-    (dashboard-setup-startup-hook))
+    (dashboard-setup-startup-hook)
+    :init
+    ;; Icons 
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-display-icons-p t) ;; display icons on both GUI and terminal
+    (setq dashboard-icon-type 'all-the-icons) ;; use `all-the-icons' package
+
+    ;; Headings
+    (setq dashboard-heading-icons '((recents . "file-directory")
+                                    (bookmarks . "bookmark")))
+
+    ;; Content is not centered by default. To center, set
+    (setq dashboard-center-content t))
+
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   (global-set-key (kbd "<f12>") 'dashboard-open)
 
   ;; Set the title
   (setq dashboard-banner-logo-title "Happy hacking!")
   (set-face-attribute 'dashboard-banner-logo-title nil
-                      :family "Consolas"
+                      :family "Pixelify Sans" ; Change to Consolas if font does not exist
                       :foreground "#e67128"
                       :height 196)
 
@@ -266,14 +314,10 @@ end just manually install them (Windows 11)
   ;; - "path/to/your/image.gif", "path/to/your/image.png" or "path/to/your/text.txt" which displays whatever gif/image/text you would prefer
   ;; - a cons of '("path/to/your/image.png" . "path/to/your/text.txt")
 
-  ;; Content is not centered by default. To center, set
-  (setq dashboard-center-content t)
 
-  ;; Icons to places  
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
 
   ;; Footer
+  (setq dashboard-set-footer t)
   (setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
   (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
                                                      :height 1.1
@@ -281,8 +325,8 @@ end just manually install them (Windows 11)
                                                      :face 'font-lock-keyword-face))
 
   ;; Change the font for footer
-  (set-face-attribute 'dashboard-footer nil
-                      :family "Consolas")
+  ;; (set-face-attribute 'dashboard-footer nil
+  ;;                     :family "Consolas")
 
   ;; Items displayed
   ;; TODO: Proper trigger needed for clock.
@@ -291,7 +335,26 @@ end just manually install them (Windows 11)
   (setq dashboard-items '((custom . 0)
                           (recents  . 5)
                           (bookmarks . 7)))
+
 #+end_src
+*** Themes
+
+#+BEGIN_SRC elisp
+  (use-package timu-spacegrey-theme
+    :ensure t
+    :config
+    (load-theme 'timu-spacegrey t))
+  
+  (defun timu-toggle-dark-light()
+    "Toogle timu-spacegray theme color"
+    (interactive)
+    (if (equal "dark" timu-spacegrey-flavour)
+        (customize-set-variable 'timu-spacegrey-flavour "light")
+      (customize-set-variable 'timu-spacegrey-flavour "dark"))
+    (load-theme (car custom-enabled-themes) t))
+  
+    (global-set-key (kbd "C-<f12>") 'timu-toggle-dark-light)
+#+END_SRC
 ** Usability packages
 These packages helps you to use directories and files without breaking your nerves!
 *** Neotree
@@ -368,31 +431,56 @@ their own folders and files.
 #+BEGIN_SRC emacs-lisp
   (setq yas-snippet-dirs
         '("~/.emacs.d/snippets"                 ;; personal snippets
-          "~/.emacs.d/elpa/yasnippet-snippets-20230220.1659/snippets")) ;; installed snippets
+          "~/.emacs.d/elpa/yasnippet-snippets-20230314.2056/snippets")) ;; installed snippets
 
   (yas-global-mode 1) ;; or M-x yas-reload-all if you've started YASnippet already.
 #+END_SRC
 
 *** Company-mode
 #+BEGIN_SRC emacs-lisp
-    (use-package company
-      :ensure t
-      :init (global-company-mode t))
+  (use-package company
+    :ensure t
+    :config
+    (setq company-idle-delay 0
+          company-minimum-prefix-length 2
+          company-show-numbers t
+          company-tooltip-limit 10
+          company-tooltip-align-annotations t
+          ;; invert the navigation direction if the the completion popup-isearch-match
+          ;; is displayed on top (happens near the bottom of windows)
+          company-tooltip-flip-when-above t)
+    (global-company-mode t)
+    )
 
-    ;;Different compaay backends below:
-    (use-package company-auctex
-      :ensure t)
+  (use-package anaconda-mode
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'anaconda-mode)
+    ;;(add-hook 'python-mode-hook 'anaconda-eldoc-mode)
+    )
 
-    (defun my-org-hook ()
-      (set (make-local-variable 'company-backends) '((:separate company-yasnippet company-capf) company-keywords)))
-;      (setq-local company-backends '((:separate company-capf company-yasnippet company-keywords)))
+  (use-package company-anaconda
+    :ensure t
+    :init (require 'rx)
+    :after (company)
+    :config
+    (add-to-list 'company-backends '(company-anaconda :with company-capf))
+    )
 
-    (add-hook 'org-mode-hook #'my-org-hook)
+  ;;Different compaay backends below:
+  (use-package company-auctex
+    :ensure t)
 
-    (setq company-minimum-prefix-length 2)
-    (setq company-idle-delay
-        (lambda () (if (company-in-string-or-comment) nil 0.2)))
-#+END_SRC
+  (defun my-org-hook ()
+    (set (make-local-variable 'company-backends) '((:separate company-yasnippet company-capf) company-keywords)))
+                                          ;      (setq-local company-backends '((:separate company-capf company-yasnippet company-keywords)))
+
+  (add-hook 'org-mode-hook #'my-org-hook)
+
+   ;;(setq company-idle-delay
+   ;;     (lambda () (if (company-in-string-or-comment) nil 0.1)))
+
+  #+END_SRC
 
 *** Smartparens
 #+BEGIN_SRC emacs-lisp
@@ -437,13 +525,13 @@ their own folders and files.
 #+end_src
 *** Sound-wav
 #+begin_src emacs-lisp
-    (use-package sound-wav
-      :ensure t)
+    ;(use-package sound-wav
+    ;  :ensure t)
 #+end_src
 *** Powershell
 #+begin_src emacs-lisp
-  (use-package powershell
-    :ensure t)
+  ;(use-package powershell
+  ;  :ensure t)
 #+end_src
 ** Coding and versioning
 *** Hugo
