@@ -4,9 +4,9 @@ All the sections below will contain declarations for my emacs
 setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
 
-#+HEADER: :eval no :exports code
-#+BEGIN_SRC emacs-lisp
-  ;; Include something like this your .emacs file:
+#+HEADER: :eval no :export code
+#+BEGIN_SRC :eval no
+;; Include something like this your .emacs file:
   (org-babel-load-file (expand-file-name "~/.emacs.d/my-conf.org"))
 #+END_SRC
 
@@ -17,10 +17,10 @@ will be duplicates with the .org config file - watch out those!
 
 Well, your *.emacs* file might look something like this:
 
-#+HEADER: :eval no :exports code
-#+BEGIN_SRC emacs-lisp
+#+HEADER: :eval no :export code
+#+BEGIN_SRC :eval no
   ;; Let's set up essential package archives
-  (require '(point)ackage)
+  (require 'package)
   (add-to-list 'package-archives
                  '("melpa" . "http://melpa.org/packages/") t)
   (unless package--initialized (package-initialize))
@@ -50,12 +50,12 @@ when emacs starts.
 Shell path for linux or osx systems
 #+BEGIN_SRC emacs-lisp
   ;;  describe-coding-system 'unix
-  (use-package exec-path-from-shell
-    :ensure t
-    :config
-    (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
-
+;;(use-package exec-path-from-shell
+;;  :ensure t
+;;  :config
+;;  (when (memq window-system '(mac ns x))
+;;    (exec-path-from-shell-initialize)))
+;;
   ;; Backup files to another location
   (setq backup-directory-alist `(("." . "~/.emacs-saves")))
 
@@ -75,11 +75,157 @@ Shell path for linux or osx systems
 
 #+RESULTS:
 : t
+*** Quelpa
+#+begin_src emacs-lisp
 
+  ;; (unless (package-installed-p 'quelpa)
+  ;;   (with-temp-buffer
+  ;;     (url-insert-file-contents "https://raw.githubusercontent.com/quelpa/quelpa/master/quelpa.el")
+  ;;     (eval-buffer)
+  ;;     (quelpa-self-upgrade)))
+
+  ;; (quelpa
+  ;;  '(quelpa-use-package
+  ;;    :fetcher git
+  ;;    :url "https://github.com/quelpa/quelpa-use-package.git"))
+  ;; (require 'quelpa-use-package)
+
+#+end_src
 ** Appearance
 
 Here are collection of delcarations and packages that mainly affects
 to appearance of emacs.
+
+*** Startup screen
+#+begin_src emacs-lisp
+(add-hook 'after-init-hook (lambda ()
+                             (drag-stuff-global-mode 1)
+                             (toggle-scroll-bar 0)))
+
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook)
+  :init
+  ;; Icons 
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-display-icons-p t) ;; display icons on both GUI and terminal
+  (setq dashboard-icon-type 'all-the-icons) ;; use `all-the-icons' package
+
+  ;; Headings
+  (setq dashboard-heading-icons '((recents . "file-directory")
+                                  (bookmarks . "bookmark")))
+
+  ;; Content is not centered by default. To center, set
+  (setq dashboard-center-content t))
+
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+(global-set-key (kbd "<f12>") 'dashboard-open)
+
+;; Set the title
+(setq dashboard-banner-logo-title "Happy hacking!")
+(set-face-attribute 'dashboard-banner-logo-title nil
+                    :family "Pixelify Sans" ; Change to Consolas if font does not exist
+                    :foreground "#e67128"
+                    :height 196)
+
+;; (defvar my-face '(:family "Silkscreen"
+;;                          :height 144))
+
+;; This function is used to insert a clock to separate line
+;;    (defun dashboard-insert-custom (list-size)
+;;         (defvar timestmp)
+;;         (setq timestmp  (current-time-string))
+;;         (put-text-property 0 (length timestmp) 'face my-face
+;;                            timestmp)
+;;         (put-text-property 11 19 'face '(:foreground "#e67128" :family "Silkscreen" :height 164)
+;;                            timestmp)
+;;
+;;         (insert timestmp)
+;;         (center-line)
+;;
+;;         (run-with-timer 1 t (lambda()
+;;                               (defvar temp)
+;;                               (defvar p)
+;;                               (setq temp (current-time-string))
+;;                               (setq p (point))
+;;                               (while (re-search-forward timestmp nil t)
+;;                                 (replace-match temp))
+;;                               (setq timestmp temp)
+;;                               (when (string= (buffer-name) "*dashboard*")
+;;                                 (revert-buffer)
+;;                                 (goto-char p)))))
+;;
+;;
+;;        (add-to-list 'dashboard-item-generators  '(custom . dashboard-insert-custom))
+;;        (add-to-list 'dashboard-items '(custom) t)
+
+;; Running the timestring with a timer, and
+;; then calling the func with the help of custom and
+;; finally altering an appearance a bit
+
+;; NOTE: MODIFICATIONS TO DASHBOARD-WIDGETS.EL ALSO NECESSARY! (2023-03-09)
+;; A new face needs to be defined there and assigned for dashboard-init-info
+;; Look, below there is used 'dashboard-init-info-face'
+(defun run-clock (list-size)
+  "Running a clock with timer"
+  (setq time (current-time-string))
+  (setq dashboard-init-info time)
+  (run-with-timer 1 t (lambda()
+                        (setq time (current-time-string))
+                        (defvar p)
+                        (setq p (point))
+                        (when (string= (buffer-name) "*dashboard*")
+                          (revert-buffer)
+                          (goto-char p)))))
+
+;; currently the custom function is not inserting lines, other than
+;; it is basically changing the original init-info line
+(add-to-list 'dashboard-item-generators  '(custom . run-clock))
+(add-to-list 'dashboard-items '(custom) t)
+
+;; Tweaking the clock's look, this face has to
+;; be created separately to dashboard-widgets.el
+
+;;Uncomment these few rows, when you have created a new face
+;;(set-face-attribute 'dashboard-init-info-face nil
+;;		      :family "Consolas"
+;;		      :height 178
+;;		      :foreground "#74af68")
+
+;;(setq dashboard-startup-banner "d:/youtubevideot/logo/logo_pixelated_small.png")
+;; Value can be
+;; - nil to display no banner
+;; - 'official which displays the official emacs logo
+;; - 'logo which displays an alternative emacs logo
+;; - 1, 2 or 3 which displays one of the text banners
+;; - "path/to/your/image.gif", "path/to/your/image.png" or "path/to/your/text.txt" which displays whatever gif/image/text you would prefer
+;; - a cons of '("path/to/your/image.png" . "path/to/your/text.txt")
+
+
+
+;; Footer
+(setq dashboard-set-footer t)
+(setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
+(setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
+                                                   :height 1.1
+                                                   :v-adjust -0.05
+                                                   :face 'font-lock-keyword-face))
+
+;; Change the font for footer
+;; (set-face-attribute 'dashboard-footer nil
+;;                     :family "Consolas")
+
+;; Items displayed
+;; TODO: Proper trigger needed for clock.
+;; Using custom here to trigger the clock. A bit
+;; messy solution but works.
+(setq dashboard-items '((custom . 0)
+                        (recents  . 5)
+                        (bookmarks . 7)))
+
+#+end_src
 *** Window
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -146,6 +292,8 @@ Also some appearance declaraitions for modeline
 #+end_src
 
 *** Org bullets
+Bullets may not work in terminal with default background unspecified.
+Changed e.g. #002b36 to unspecified-bg, and prefixed asterisks are ugly visible
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
     :ensure t
@@ -157,16 +305,12 @@ Also some appearance declaraitions for modeline
 
 Let's just set some cool bullets for orgbullets
 #+BEGIN_SRC emacs-lisp
-  (setq org-bullets-bullet-list '("●"
-                                  "◉"
-                                  "○"
-                                  "•"
-                                  "·"))
+  (setq org-bullets-bullet-list '("󰯫"
+                                  "󰯮"
+                                  "󰯱"
+                                  "󰯷"
+                                  "󰯺"))
 
-  ;;'("α"
-  ;;  "β"
-  ;;  "λ"
-  ;;  "ω")
 #+END_SRC
 
 *** Colors
@@ -193,7 +337,7 @@ end just manually install them (Windows 11)
   ;; Additionally, download emacswiki.org/emacs/font-lock+.el and add it
   ;; to the load path
 
-  ;;        (use-package font-lock+
+  ;;(use-package font-lock+
   ;;:ensure t)
 
   (use-package all-the-icons
@@ -207,167 +351,58 @@ end just manually install them (Windows 11)
   (set-fontset-font t 'unicode (font-spec :family "Weather Icons") nil 'append)
 #+end_src
 
-*** Startup screen
+*** Nerd fonts
 #+begin_src emacs-lisp
-  (add-hook 'after-init-hook (lambda ()
-                               (drag-stuff-global-mode 1)
-                               (toggle-scroll-bar 0)))
-
-  (use-package dashboard
-    :ensure t
-    :config
-    (dashboard-setup-startup-hook)
-    :init
-    ;; Icons 
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-display-icons-p t) ;; display icons on both GUI and terminal
-    (setq dashboard-icon-type 'all-the-icons) ;; use `all-the-icons' package
-
-    ;; Headings
-    (setq dashboard-heading-icons '((recents . "file-directory")
-                                    (bookmarks . "bookmark")))
-
-    ;; Content is not centered by default. To center, set
-    (setq dashboard-center-content t))
-
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  (global-set-key (kbd "<f12>") 'dashboard-open)
-
-  ;; Set the title
-  (setq dashboard-banner-logo-title "Happy hacking!")
-  (set-face-attribute 'dashboard-banner-logo-title nil
-                      :family "Pixelify Sans" ; Change to Consolas if font does not exist
-                      :foreground "#e67128"
-                      :height 196)
-
-  ;; (defvar my-face '(:family "Silkscreen"
-  ;;                          :height 144))
-
-  ;; This function is used to insert a clock to separate line
-  ;;    (defun dashboard-insert-custom (list-size)
-  ;;         (defvar timestmp)
-  ;;         (setq timestmp  (current-time-string))
-  ;;         (put-text-property 0 (length timestmp) 'face my-face
-  ;;                            timestmp)
-  ;;         (put-text-property 11 19 'face '(:foreground "#e67128" :family "Silkscreen" :height 164)
-  ;;                            timestmp)
-  ;;
-  ;;         (insert timestmp)
-  ;;         (center-line)
-  ;;
-  ;;         (run-with-timer 1 t (lambda()
-  ;;                               (defvar temp)
-  ;;                               (defvar p)
-  ;;                               (setq temp (current-time-string))
-  ;;                               (setq p (point))
-  ;;                               (while (re-search-forward timestmp nil t)
-  ;;                                 (replace-match temp))
-  ;;                               (setq timestmp temp)
-  ;;                               (when (string= (buffer-name) "*dashboard*")
-  ;;                                 (revert-buffer)
-  ;;                                 (goto-char p)))))
-  ;;
-  ;;
-  ;;        (add-to-list 'dashboard-item-generators  '(custom . dashboard-insert-custom))
-  ;;        (add-to-list 'dashboard-items '(custom) t)
-
-  ;; Running the timestring with a timer, and
-  ;; then calling the func with the help of custom and
-  ;; finally altering an appearance a bit
-
-  ;; NOTE: MODIFICATIONS TO DASHBOARD-WIDGETS.EL ALSO NECESSARY! (2023-03-09)
-  ;; A new face needs to be defined there and assigned for dashboard-init-info
-  ;; Look, below there is used 'dashboard-init-info-face'
-  (defun run-clock (list-size)
-    "Running a clock with timer"
-    (setq time (current-time-string))
-    (setq dashboard-init-info time)
-    (run-with-timer 1 t (lambda()
-                          (setq time (current-time-string))
-                          (defvar p)
-                          (setq p (point))
-                          (when (string= (buffer-name) "*dashboard*")
-                            (revert-buffer)
-                            (goto-char p)))))
-
-  ;; currently the custom function is not inserting lines, other than
-  ;; it is basically changing the original init-info line
-  (add-to-list 'dashboard-item-generators  '(custom . run-clock))
-  (add-to-list 'dashboard-items '(custom) t)
-
-  ;; Tweaking the clock's look, this face has to
-  ;; be created separately to dashboard-widgets.el
-
-  ;;Uncomment these few rows, when you have created a new face
-  ;;(set-face-attribute 'dashboard-init-info-face nil
-  ;;		      :family "Consolas"
-  ;;		      :height 178
-  ;;		      :foreground "#74af68")
-
-  ;;(setq dashboard-startup-banner "d:/youtubevideot/logo/logo_pixelated_small.png")
-  ;; Value can be
-  ;; - nil to display no banner
-  ;; - 'official which displays the official emacs logo
-  ;; - 'logo which displays an alternative emacs logo
-  ;; - 1, 2 or 3 which displays one of the text banners
-  ;; - "path/to/your/image.gif", "path/to/your/image.png" or "path/to/your/text.txt" which displays whatever gif/image/text you would prefer
-  ;; - a cons of '("path/to/your/image.png" . "path/to/your/text.txt")
-
-
-
-  ;; Footer
-  (setq dashboard-set-footer t)
-  (setq dashboard-footer-messages '("Ylivuoto Dashboard. \"No wild kangaroos in Austria!\""))
-  (setq dashboard-footer-icon (all-the-icons-octicon "dashboard"
-                                                     :height 1.1
-                                                     :v-adjust -0.05
-                                                     :face 'font-lock-keyword-face))
-
-  ;; Change the font for footer
-  ;; (set-face-attribute 'dashboard-footer nil
-  ;;                     :family "Consolas")
-
-  ;; Items displayed
-  ;; TODO: Proper trigger needed for clock.
-  ;; Using custom here to trigger the clock. A bit
-  ;; messy solution but works.
-  (setq dashboard-items '((custom . 0)
-                          (recents  . 5)
-                          (bookmarks . 7)))
-
+  (use-package nerd-icons
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+  )
 #+end_src
 *** Themes
 
-#+BEGIN_SRC elisp
-  (use-package timu-spacegrey-theme
-    :ensure t
-    :config
-    (load-theme 'timu-spacegrey t))
-  
-  (defun timu-toggle-dark-light()
-    "Toogle timu-spacegray theme color"
-    (interactive)
-    (if (equal "dark" timu-spacegrey-flavour)
-        (customize-set-variable 'timu-spacegrey-flavour "light")
-      (customize-set-variable 'timu-spacegrey-flavour "dark"))
-    (load-theme (car custom-enabled-themes) t))
-  
-    (global-set-key (kbd "C-<f12>") 'timu-toggle-dark-light)
+#+BEGIN_SRC emacs-lisp
+;;  (use-package timu-spacegrey-theme
+;;    :ensure t
+;;    :config
+;;    (load-theme 'timu-spacegrey t))
+;;  
+;;  (defun timu-toggle-dark-light()
+;;    "Toogle timu-spacegray theme color"
+;;    (interactive)
+;;    (if (equal "dark" timu-spacegrey-flavour)
+;;        (customize-set-variable 'timu-spacegrey-flavour "light")
+;;      (customize-set-variable 'timu-spacegrey-flavour "dark"))
+;;    (load-theme (car custom-enabled-themes) t))
+;;  
+;;    (global-set-key (kbd "C-<f12>") 'timu-toggle-dark-light)
 #+END_SRC
+
 ** Usability packages
 These packages helps you to use directories and files without breaking your nerves!
 *** Neotree
 #+BEGIN_SRC emacs-lisp
-  (use-package neotree
-    :ensure t
-    :init (global-set-key [f8] 'neotree-toggle))
-  neo-smart-open t
-
-  (add-hook 'neo-after-create-hook (lambda (_x) (display-line-numbers-mode -1)))
-  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+;;  (use-package neotree
+;;    :ensure t
+;;    :init (global-set-key [f8] 'neotree-toggle))
+;;  neo-smart-open t
+;;
+;;  (add-hook 'neo-after-create-hook (lambda (_x) (display-line-numbers-mode -1)))
+;;  (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 #+END_SRC
+*** Treemacs
+#+begin_src emacs-lisp
 
+(use-package treemacs
+:ensure t)
+
+(use-package treemacs-nerd-icons
+  :config
+  (treemacs-load-theme "nerd-icons"))
+
+#+end_src
 *** Drag-stuff
 #+BEGIN_SRC emacs-lisp
   (use-package drag-stuff
@@ -388,31 +423,6 @@ Suggests and organizes stuff, when giving commands etc.
     :ensure t
     :bind ("M-x" . helm-M-x)
     :init (helm-mode 1))
-#+END_SRC
-
-Appearance tweak
-#+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'helm-header nil
-                      :background "dark slate grey"
-                      :foreground "white"
-                      :box '(:line-width 8 :color "dark slate gray"))
-
-  (set-face-attribute 'helm-source-header nil
-                      :background "dark slate grey"
-                      :foreground "white"
-                      :box '(:line-width 2 :color "dark slate grey"))
-
-  (set-face-attribute 'helm-selection nil
-                      :background 'unspecified
-                      :foreground "orange"
-                      :weight 'bold)
-
-  (set-face-attribute 'helm-candidate-number nil
-                      :background "DarkSlateGray3"
-                      :box '(:line-width 8 :color "DarkSlateGray3")
-                      :extend nil)
-
-
 #+END_SRC
 
 *** Yasnippet
@@ -495,6 +505,9 @@ their own folders and files.
   (use-package flycheck
     :ensure t
     :config (global-flycheck-mode))
+
+  (with-eval-after-load 'flycheck
+    (add-hook 'flycheck-mode-hook #'flycheck-falco-rules-setup))
 #+END_SRC
 *** Org-pomodoro
 
@@ -534,6 +547,19 @@ their own folders and files.
   ;  :ensure t)
 #+end_src
 ** Coding and versioning
+*** Copilot
+#+begin_src emacs-lisp
+  ;; (use-package copilot
+  ;;   :quelpa (copilot :fetcher github
+  ;;                    :repo "copilot-emacs/copilot.el"
+  ;;                    :branch "main"
+  ;;                    :files ("dist" "*.el")))
+  ;; you can utilize :map :hook and :config to customize copilot
+  ;;(define-key copilot-completion-map (kbd "C-c TAB") 'copilot-accept-completion)
+#+end_src
+
+#+RESULTS:
+
 *** Hugo
 #+begin_src emacs-lisp
   ;; Update files with last modifed date, when #+lastmod: is available
@@ -571,31 +597,23 @@ their own folders and files.
   ;;          '(save mode-enabled idle-change)
   ;;          (company-mode 1)
   ;;          (eldoc-mode 1)))
-
-  (use-package typescript-mode
-    :ensure t)
-
-
-  ;;  (use-package tide
-  ;;    :ensure t
-  ;;    :after  (typescript-mode flycheck company)
-  ;;    :hook ((typescript-mode . setup-tide-mode)
-  ;;           (before-save . tide-format-before-save)))<
-
-  (use-package web-mode
-    :ensure t)
-  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
-  ;;    (add-hook 'web-mode-hook
+  ;; (use-package tree-sitter-langs
+  ;;   :ensure t
+  ;;   :after tree-sitter)
+  ;; (use-package web-mode
+  ;;   :ensure t)
+  ;; (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  ;; (add-hook 'web-mode-hook
   ;;            (lambda ()
   ;;              (when (string-equal "tsx" (file-name-extension buffer-file-name))
   ;;                (setup-tide-mode))))
                                           ;enable typescript-tslint checker
   ;;    (flycheck-add-mode 'typescript-tslint 'web-mode)
 
-  (use-package js2-mode
-    :ensure t )
-  (add-to-list 'auto-mode-alist '("\\.*js\\'" . js2-mode))
+  ;; (use-package js2-mode
+  ;;   :ensure t )
+  ;; (add-to-list 'auto-mode-alist '("\\.*js\\'" . js2-mode))
 #+end_src
 
 *** Yaml
