@@ -4,7 +4,7 @@ setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
 
 #+header: :eval no :export code
-#+begin_src :eval
+#+begin_src emacs-lisp
   ;; Include something like this your initalization file:
     (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.org"))
 #+end_src
@@ -30,7 +30,27 @@ There are things that are not configured properly, like
 This configuration uses ~init.el~ file, and separate tangling ~config.org~ file.
 
 ** Init.el
+#+begin_src emacs-lisp
+  ;;; package --- Summary
+  ;;; Commentary:
+  ;; The rest of the configuration is taken care in a separate file, at
+  ;; the moment called config.org but may be named whatever sensible.
 
+  ;;; Code:
+  (add-to-list 'load-path "~/.emacs.d/config/")
+
+  ;; Check if the .org file has been updated
+  (when (file-newer-than-file-p "~/.emacs.d/config/config.org" "~/.emacs.d/config/config.el")
+    (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.org")))
+
+  (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.el"))
+
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file)
+
+  (provide 'init)
+  ;;; init.el ends here
+#+end_src
 ** Config.org
 *** Emacs configuration
 

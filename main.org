@@ -5,7 +5,7 @@ setup. When using .org configuration file, please include a short line
 in your .emacs or init.el file
 
 #+HEADER: :eval no :export code
-#+BEGIN_SRC :eval no
+#+BEGIN_SRC emacs-lisp :eval no :tangle nil
 ;; Include something like this your initalization file:
   (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.org"))
 #+END_SRC
