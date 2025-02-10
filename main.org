@@ -20,18 +20,17 @@ file.
 Well, your ~.emacs~ or ~init.el~ file and the ~config.org~ might look
 something like the contents in following sections.
 
-#+ATTR_HTML: :class important
 #+BEGIN_QUOTE
-[!IMPORTANT] There are things that are not configured properly, like
+[!IMPORTANT]
+There are things that are not configured properly, like
  tabbing works differently in different modes etc. You may wish also
  customize ~vertico~, ~consult~, ~orderless~ and other packages for you. If
  you wish to have consistent setup, please check and set keybindings.
 #+END_QUOTE
 
-* Emacs configuration
 This configuration uses ~init.el~ file, and separate tangling ~config.org~ file.
 
 ** Init.el
-#+INCLUDE: "~/.emacs.d/init.el"
+#+INCLUDE: "~/.emacs.d/init.el" src emacs-lisp
 ** Config.org
 #+INCLUDE: "~/.emacs.d/config/config.org"
