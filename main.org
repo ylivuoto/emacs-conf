@@ -1,0 +1,37 @@
+
+* Emacs configuration
+All the sections below will contain declarations for my emacs
+setup. When using .org configuration file, please include a short line
+in your .emacs or init.el file
+
+#+HEADER: :eval no :export code
+#+BEGIN_SRC :eval no
+;; Include something like this your initalization file:
+  (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.org"))
+#+END_SRC
+
+That is to include your fresh config file! Also, be careful when
+making changes. Sometimes, when making changes to settings graphically
+via ~M-x customize~, emacs will create some new lines to .emacs file
+and there will be duplicates with the .org config file - watch out
+those! These customizations are possible to move separate ~custom.el~
+file.
+
+Well, your ~.emacs~ or ~init.el~ file and the ~config.org~ might look
+something like the contents in following sections.
+
+#+ATTR_HTML: :class important
+#+BEGIN_QUOTE
+[!IMPORTANT] There are things that are not configured properly, like
+ tabbing works differently in different modes etc. You may wish also
+ customize ~vertico~, ~consult~, ~orderless~ and other packages for you. If
+ you wish to have consistent setup, please check and set keybindings.
+#+END_QUOTE
+
+* Emacs configuration
+This configuration uses ~init.el~ file, and separate tangling ~config.org~ file.
+
+** Init.el
+#+INCLUDE: "~/.emacs.d/init.el"
+** Config.org
+#+INCLUDE: "~/.emacs.d/config/config.org"
