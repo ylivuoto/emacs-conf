@@ -22,6 +22,7 @@ something like the contents in following sections.
 
 #+ATTR_HTML: :class important
 #+BEGIN_QUOTE
+[!IMPORTANT]
 *IMPORTANT:* There are few things that are not configured properly,
  like tabbing works differently in different modes etc. If you wish to
  have consistent setup, please check and set keybindings.
@@ -31,6 +32,27 @@ something like the contents in following sections.
 This configuration uses ~init.el~ file, and separate tangling ~config.org~ file.
 
 ** Init.el
-#+INCLUDE: "~/.emacs.d/init.el"
+#+begin_src emacs-lisp :tangle nil
+;;; package --- Summary
+;;; Commentary:
+;; The rest of the configuration is taken care in a separate file, at
+;; the moment called config.org but may be named whatever sensible.
+
+;;; Code:
+(add-to-list 'load-path "~/.emacs.d/config/")
+
+;; Check if the .org file has been updated
+(when (file-newer-than-file-p "~/.emacs.d/config/config.org" "~/.emacs.d/config/config.el")
+  (org-babel-load-file (expand-file-name "~/.emacs.d/config/config.org")))
+
+(org-babel-load-file (expand-file-name "~/.emacs.d/config/config.el"))
+
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
+
+(provide 'init)
+;;; init.el ends here
+#+end_src
+
 ** Config.org
-#+INCLUDE: "~/.emacs.d/config/config.org"
+#+INCLUDE: "./config.org"
